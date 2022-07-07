@@ -1,49 +1,20 @@
-import { useState } from "react";
-
-const Filter = (props) => {
-  return (
-    <div>
-      filter shown with:{" "}
-      <input value={props.filterValue} onChange={props.filterChange} />
-    </div>
-  );
-};
-
-const PersonForm = (props) => {
-  return (
-    <form onSubmit={props.formSubmit}>
-      <div>
-        name: <input value={props.nameValue} onChange={props.nameChange} />
-      </div>
-      <div>
-        number:{" "}
-        <input value={props.numberValue} onChange={props.numberChange} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  );
-};
-
-const Persons = ({ persons }) =>
-  persons.map((p, i) => (
-    <p key={i}>
-      {p.name} {p.number}
-    </p>
-  ));
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [filteredPersons, setFilteredPersons] = useState(persons);
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((response) => {
+      setPersons(response.data);
+    });
+  }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -68,14 +39,6 @@ const App = () => {
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value);
-
-    if (event.target.value !== "") {
-      var newFilteredPersons = persons.filter((p) =>
-        p.name.toLowerCase().includes(event.target.value)
-      );
-
-      setFilteredPersons(newFilteredPersons);
-    }
   };
 
   return (
@@ -94,7 +57,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={persons} filter={newFilter} />
     </div>
   );
 };
