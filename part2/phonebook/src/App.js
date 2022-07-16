@@ -3,12 +3,14 @@ import axios from "axios";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:3001/persons").then((response) => {
@@ -27,6 +29,10 @@ const App = () => {
     setPersons(persons.concat(personObject));
     setNewName("");
     setNewNumber("");
+    setNotification({
+      message: "Added " + newName,
+      isError: false,
+    });
   };
 
   const handleNameChange = (event) => {
@@ -44,6 +50,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification notification={notification} />
 
       <Filter filterValue={newFilter} filterChange={handleFilterChange} />
 
